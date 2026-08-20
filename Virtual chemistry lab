@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Chemistry Laboratory VR</title>
+  <meta name="description" content="A simple but functional Virtual Chemistry Laboratory VR prototype using A-Frame for Meta Quest 3S.">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- A-Frame CDN -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  
+  <!-- Custom Modules -->
+  <script src="js/interaction.js"></script>
+  <script src="js/chemistry.js"></script>
+  <script src="js/experiment.js"></script>
+  <script src="js/main.js"></script>
+</head>
+<body>
+
+  <!-- Desktop Instructions HUD Overlay -->
+  <div id="desktop-instructions">
+    <button class="close-btn" aria-label="Close instructions">&times;</button>
+    <div class="info-icon">ⓘ</div>
+    <h2>Desktop Testing</h2>
+    <p>Use your desktop browser to preview and test the lab before launching in Quest VR.</p>
+    <ul>
+      <li><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> - Move around the lab</li>
+      <li><strong>Mouse Drag</strong> - Look around</li>
+      <li><strong>Left Click</strong> - Interact / Grab bottle / Toggle Bunsen burner / Teleport</li>
+      <li><kbd>R</kbd> - Tilt bottle while holding to pour acid (Desktop testing only)</li>
+    </ul>
+  </div>
+
+  <!-- A-Frame Scene with Mouse Raycaster -->
+  <a-scene 
+    cursor="rayOrigin: mouse" 
+    raycaster="objects: .clickable; far: 25"
+    physics="gravity: 0" 
+    renderer="antialias: true; colorManagement: true; shadowMapEnabled: true;"
+    chemistry-experiment>
+    
+    <a-assets></a-assets>
+
+    <!-- 1. LIGHTING & ENVIRONMENT -->
+    <a-light type="ambient" color="#38bdf8" intensity="0.45"></a-light>
+    
+    <a-light 
+      type="directional" 
+      color="#ffffff" 
+      intensity="0.8" 
+      position="2 4 1" 
+      castShadow="true"
+      shadow-camera-left="-3"
+      shadow-camera-right="3"
+      shadow-camera-top="3"
+      shadow-camera-bottom="-3">
+    </a-light>
+
+    <!-- Floor -->
+    <a-plane 
+      position="0 0 0" 
+      rotation="-90 0 0" 
+      width="12" 
+      height="12" 
+      color="#0f172a" 
+      roughness="0.9" 
+      metalness="0.1" 
+      receive-shadow="true">
+    </a-plane>
+
+    <!-- Walls -->
+    <a-plane position="0 2.5 -5" rotation="0 0 0" width="12" height="5" color="#1e293b" metalness="0.2" roughness="0.8"></a-plane>
+    <a-plane position="-5 2.5 0" rotation="0 90 0" width="12" height="5" color="#1e293b" metalness="0.2" roughness="0.8"></a-plane>
+    <a-plane position="5 2.5 0" rotation="0 -90 0" width="12" height="5" color="#1e293b" metalness="0.2" roughness="0.8"></a-plane>
+    <a-plane position="0 5 0" rotation="90 0 0" width="12" height="12" color="#0b0f19" roughness="0.9"></a-plane>
+
+    <!-- Ceiling lighting panels -->
+    <a-box position="-2 4.95 -2" width="1" height="0.05" depth="2" color="#e0f2fe" material="emissive: #e0f2fe; emissiveIntensity: 1.0"></a-box>
+    <a-box position="2 4.95 -2" width="1" height="0.05" depth="2" color="#e0f2fe" material="emissive: #e0f2fe; emissiveIntensity: 1.0"></a-box>
+    <a-box position="0 4.95 2" width="2" height="0.05" depth="1" color="#e0f2fe" material="emissive: #e0f2fe; emissiveIntensity: 1.0"></a-box>
+
+
+    <!-- 2. LABORATORY INFRASTRUCTURE -->
+    <a-entity id="main-bench" position="0 0 -1">
+      <a-box position="0 0.85 0" width="2.4" height="0.06" depth="1.0" color="#334155" roughness="0.6" metalness="0.1" castShadow="true" receiveShadow="true"></a-box>
+      <a-cylinder position="-1.1 0.425 0.4" radius="0.03" height="0.85" color="#64748b" metalness="0.8" roughness="0.2"></a-cylinder>
+      <a-cylinder position="1.1 0.425 0.4" radius="0.03" height="0.85" color="#64748b" metalness="0.8" roughness="0.2"></a-cylinder>
+      <a-cylinder position="-1.1 0.425 -0.4" radius="0.03" height="0.85" color="#64748b" metalness="0.8" roughness="0.2"></a-cylinder>
+      <a-cylinder position="1.1 0.425 -0.4" radius="0.03" height="0.85" color="#64748b" metalness="0.8" roughness="0.2"></a-cylinder>
+      
+      <!-- Built-in Sink unit -->
+      <a-entity id="sink" position="-0.75 0.85 0">
+        <a-plane position="0 0.031 0" rotation="-90 0 0" width="0.4" height="0.3" color="#1e293b" roughness="0.7"></a-plane>
+        <a-box position="0 0.03 0.15" width="0.4" height="0.01" depth="0.02" color="#475569"></a-box>
+        <a-box position="0 0.03 -0.15" width="0.4" height="0.01" depth="0.02" color="#475569"></a-box>
+        <a-box position="-0.2 0.03 0" width="0.02" height="0.01" depth="0.3" color="#475569"></a-box>
+        <a-box position="0.2 0.03 0" width="0.02" height="0.01" depth="0.3" color="#475569"></a-box>
+        <a-cylinder position="0 0.15 -0.12" radius="0.01" height="0.2" color="#94a3b8" metalness="0.9" roughness="0.1"></a-cylinder>
+        <a-cylinder position="0 0.25 -0.07" radius="0.01" height="0.1" rotation="90 0 0" color="#94a3b8" metalness="0.9" roughness="0.1"></a-cylinder>
+      </a-entity>
+    </a-entity>
+
+    <!-- Side Workbench Left -->
+    <a-entity id="side-bench-left" position="-3.5 0 -2" rotation="0 45 0">
+      <a-box position="0 0.85 0" width="1.8" height="0.06" depth="0.8" color="#1e293b" roughness="0.7"></a-box>
+      <a-box position="-0.8 0.425 0" width="0.06" height="0.85" depth="0.8" color="#0f172a"></a-box>
+      <a-box position="0.8 0.425 0" width="0.06" height="0.85" depth="0.8" color="#0f172a"></a-box>
+      <a-box position="0 1.4 -0.2" width="1.2" height="0.7" depth="0.3" color="#334155" roughness="0.5" metalness="0.2">
+        <a-plane position="-0.3 0 0.155" width="0.55" height="0.65" color="#38bdf8" opacity="0.25" transparent="true" metalness="0.8"></a-plane>
+        <a-plane position="0.3 0 0.155" width="0.55" height="0.65" color="#38bdf8" opacity="0.25" transparent="true" metalness="0.8"></a-plane>
+      </a-box>
+    </a-entity>
+
+    <!-- Emergency Exit door -->
+    <a-entity id="exit-door" position="4.9 0 3" rotation="0 -90 0">
+      <a-box position="0 1.1 0" width="1.2" height="2.2" depth="0.05" color="#334155"></a-box>
+      <a-box position="0 2.4 0.05" width="0.5" height="0.25" depth="0.05" color="#22c55e" material="emissive: #22c55e; emissiveIntensity: 1.0">
+        <a-text value="EXIT" color="#ffffff" align="center" width="2" position="0 0 0.03"></a-text>
+      </a-box>
+    </a-entity>
+
+
+    <!-- 3. EXPERIMENT PANEL BOARDS -->
+    <a-entity id="objective-board" position="-0.75 1.6 -1.8">
+      <a-box width="0.8" height="0.7" depth="0.03" color="#0f172a" roughness="0.9" metalness="0.3"></a-box>
+      <a-box width="0.82" height="0.72" depth="0.01" position="0 0 -0.015" color="#00ffd5" material="emissive: #00ffd5; emissiveIntensity: 0.5"></a-box>
+      <a-cylinder position="0 -0.6 0" radius="0.015" height="0.6" color="#475569" metalness="0.5"></a-cylinder>
+      <a-text id="objective-text" position="0 0 0.025" width="0.75" align="center" wrap-count="24" color="#ffffff"></a-text>
+    </a-entity>
+
+    <a-entity id="safety-board" position="0.75 1.6 -1.8">
+      <a-box width="0.8" height="0.7" depth="0.03" color="#0f172a" roughness="0.9" metalness="0.3"></a-box>
+      <a-box width="0.82" height="0.72" depth="0.01" position="0 0 -0.015" color="#334155"></a-box>
+      <a-cylinder position="0 -0.6 0" radius="0.015" height="0.6" color="#475569" metalness="0.5"></a-cylinder>
+      <a-text id="safety-text" position="0 0 0.025" width="0.75" align="center" wrap-count="24" color="#e2e8f0"></a-text>
+    </a-entity>
+
+
+    <!-- 4. VIRTUAL CHEMISTRY LAB EQUIPMENT -->
+    <!-- Interactive Acid Bottle -->
+    <a-entity 
+      id="chemical-bottle" 
+      grabbable 
+      pourable 
+      position="-0.3 0.88 -0.9"
+      class="clickable">
+      <a-cylinder radius="0.04" height="0.12" color="#0369a1" roughness="0.1" metalness="0.4" opacity="0.85" transparent="true" class="clickable"></a-cylinder>
+      <a-cylinder position="0 0.08 0" radius="0.018" height="0.04" color="#0369a1" roughness="0.1" metalness="0.4" opacity="0.85" transparent="true" class="clickable"></a-cylinder>
+      <a-cylinder position="0 0.105 0" radius="0.02" height="0.015" color="#78350f" roughness="0.8" class="clickable"></a-cylinder>
+      <a-plane position="0 0 0.041" rotation="0 0 0" width="0.065" height="0.05" color="#ffffff" class="clickable">
+        <a-text value="HCl\nAcid" color="#be123c" align="center" width="0.4" wrap-count="10" position="0 0 0.005"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- Transparent Beaker -->
+    <a-entity 
+      id="chemical-beaker" 
+      grabbable
+      class="beaker clickable" 
+      position="0.1 0.88 -0.9">
+      <a-cylinder radius="0.07" height="0.18" color="#e2e8f0" opacity="0.3" transparent="true" side="double" open-ended="false" roughness="0.1" metalness="0.4" class="clickable"></a-cylinder>
+      <a-ring position="0 0.09 0" rotation="90 0 0" radius-inner="0.068" radius-outer="0.07" color="#e2e8f0" opacity="0.4" transparent="true" class="clickable"></a-ring>
+      <a-box position="0.065 0.05 0" width="0.005" height="0.002" depth="0.01" color="#ffffff" class="clickable"></a-box>
+      <a-box position="0.065 0 0" width="0.005" height="0.002" depth="0.01" color="#ffffff" class="clickable"></a-box>
+      <a-box position="0.065 -0.05 0" width="0.005" height="0.002" depth="0.01" color="#ffffff" class="clickable"></a-box>
+      <a-entity beaker-liquid="volume: 0.25; color: #3b82f6; diameter: 0.138; heightMax: 0.17"></a-entity>
+    </a-entity>
+
+    <!-- Bunsen Burner -->
+    <a-entity 
+      id="bunsen-burner" 
+      bunsen-burner 
+      position="0.5 0.88 -0.9"
+      class="clickable">
+      <a-cylinder radius="0.05" height="0.015" color="#1e293b" metalness="0.7" roughness="0.4" class="clickable"></a-cylinder>
+      <a-cylinder position="0 0.075 0" radius="0.01" height="0.14" color="#94a3b8" metalness="0.9" roughness="0.1" class="clickable"></a-cylinder>
+      <a-cylinder position="0 0.02 0" radius="0.013" height="0.015" color="#b45309" metalness="0.8" roughness="0.2" class="clickable"></a-cylinder>
+      <a-box position="0.035 0.01 0" width="0.015" height="0.015" depth="0.02" color="#e11d48" class="clickable"></a-box>
+      <a-cone 
+        class="burner-flame" 
+        position="0 0.185 0" 
+        radius-bottom="0.02" 
+        radius-top="0.002" 
+        height="0.08" 
+        color="#38bdf8" 
+        opacity="0.85" 
+        transparent="true" 
+        material="emissive: #38bdf8; emissiveIntensity: 1.0">
+        <a-cone radius-bottom="0.01" radius-top="0.001" height="0.04" position="0 -0.02 0" color="#f59e0b" opacity="0.9" material="emissive: #f59e0b; emissiveIntensity: 0.8"></a-cone>
+      </a-cone>
+      <a-light 
+        class="burner-light" 
+        type="point" 
+        color="#38bdf8" 
+        intensity="0.8" 
+        distance="0.8" 
+        position="0 0.25 0">
+      </a-light>
+    </a-entity>
+
+    <!-- Test Tube Rack -->
+    <a-entity id="test-tube-rack" position="-0.85 0.88 -0.8">
+      <a-box position="0 0.01 0" width="0.25" height="0.015" depth="0.09" color="#b45309" roughness="0.8"></a-box>
+      <a-box position="0 0.08 0" width="0.25" height="0.01" depth="0.09" color="#b45309" roughness="0.8"></a-box>
+      <a-box position="-0.12 0.045 0" width="0.01" height="0.08" depth="0.09" color="#b45309"></a-box>
+      <a-box position="0.12 0.045 0" width="0.01" height="0.08" depth="0.09" color="#b45309"></a-box>
+    </a-entity>
+
+    <!-- Test Tube 1 -->
+    <a-entity id="test-tube-1" grabbable position="-0.91 0.95 -0.8" class="clickable">
+      <a-cylinder radius="0.014" height="0.11" color="#e2e8f0" opacity="0.35" transparent="true" side="double" open-ended="false" class="clickable"></a-cylinder>
+      <a-sphere position="0 -0.055 0" radius="0.014" color="#e2e8f0" opacity="0.35" transparent="true" side="double" class="clickable"></a-sphere>
+      <a-cylinder position="0 -0.015 0" radius="0.0135" height="0.07" color="#22c55e" opacity="0.75" transparent="true" class="clickable"></a-cylinder>
+      <a-sphere position="0 -0.05 0" radius="0.0135" color="#22c55e" opacity="0.75" transparent="true" class="clickable"></a-sphere>
+    </a-entity>
+
+    <!-- Test Tube 2 -->
+    <a-entity id="test-tube-2" grabbable position="-0.79 0.95 -0.8" class="clickable">
+      <a-cylinder radius="0.014" height="0.11" color="#e2e8f0" opacity="0.35" transparent="true" side="double" open-ended="false" class="clickable"></a-cylinder>
+      <a-sphere position="0 -0.055 0" radius="0.014" color="#e2e8f0" opacity="0.35" transparent="true" side="double" class="clickable"></a-sphere>
+    </a-entity>
+
+    <!-- Conical Flask -->
+    <a-entity id="conical-flask" grabbable position="0.85 0.88 -0.6" class="clickable">
+      <a-cone radius-bottom="0.055" radius-top="0.015" height="0.11" color="#e2e8f0" opacity="0.3" transparent="true" side="double" roughness="0.1" class="clickable"></a-cone>
+      <a-cylinder position="0 0.075 0" radius="0.015" height="0.04" color="#e2e8f0" opacity="0.3" transparent="true" side="double" roughness="0.1" class="clickable"></a-cylinder>
+      <a-cone position="0 -0.02 0" radius-bottom="0.051" radius-top="0.025" height="0.06" color="#f97316" opacity="0.75" transparent="true" class="clickable"></a-cone>
+    </a-entity>
+
+    <!-- Measuring Cylinder -->
+    <a-entity id="measuring-cylinder" grabbable position="0.85 0.88 -0.8" class="clickable">
+      <a-cylinder radius="0.04" height="0.008" color="#94a3b8" roughness="0.5" class="clickable"></a-cylinder>
+      <a-cylinder position="0 0.1 0" radius="0.02" height="0.2" color="#e2e8f0" opacity="0.3" transparent="true" side="double" roughness="0.1" class="clickable"></a-cylinder>
+      <a-box position="0.019 0.05 0" width="0.002" height="0.001" depth="0.005" color="#ffffff" class="clickable"></a-box>
+      <a-box position="0.019 0.1 0" width="0.002" height="0.001" depth="0.005" color="#ffffff" class="clickable"></a-box>
+      <a-box position="0.019 0.15 0" width="0.002" height="0.001" depth="0.005" color="#ffffff" class="clickable"></a-box>
+      <a-cylinder position="0 0.04 0" radius="0.0195" height="0.08" color="#a855f7" opacity="0.7" transparent="true" class="clickable"></a-cylinder>
+    </a-entity>
+
+
+    <!-- 5. TELEPORTATION HOTSPOTS -->
+    <a-ring teleport-node position="0 0.01 0.6" radius-inner="0.22" radius-outer="0.25" color="#00ffd5" rotation="-90 0 0" material="emissive: #00ffd5; emissiveIntensity: 0.3" class="clickable">
+      <a-cylinder radius="0.22" height="0.002" color="#00ffd5" opacity="0.15" transparent="true" class="clickable"></a-cylinder>
+    </a-ring>
+    <a-ring teleport-node position="-1.5 0.01 -0.5" radius-inner="0.22" radius-outer="0.25" color="#00ffd5" rotation="-90 0 0" material="emissive: #00ffd5; emissiveIntensity: 0.3" class="clickable">
+      <a-cylinder radius="0.22" height="0.002" color="#00ffd5" opacity="0.15" transparent="true" class="clickable"></a-cylinder>
+    </a-ring>
+    <a-ring teleport-node position="1.5 0.01 -0.5" radius-inner="0.22" radius-outer="0.25" color="#00ffd5" rotation="-90 0 0" material="emissive: #00ffd5; emissiveIntensity: 0.3" class="clickable">
+      <a-cylinder radius="0.22" height="0.002" color="#00ffd5" opacity="0.15" transparent="true" class="clickable"></a-cylinder>
+    </a-ring>
+
+
+    <!-- 6. BACKGROUND STUDENTS -->
+    <a-entity id="student-1" student-idle="speed: 0.9" position="-2.6 1.15 -2.2" rotation="0 65 0">
+      <a-cylinder radius="0.18" height="0.7" color="#3b82f6"></a-cylinder>
+      <a-sphere class="student-head" radius="0.13" position="0 0.48 0" color="#fed7aa"></a-sphere>
+      <a-box width="0.22" height="0.08" depth="0.22" position="0 0.59 0" color="#1e1b4b"></a-box>
+      <a-cylinder class="student-larm" radius="0.04" height="0.35" position="-0.22 0.15 0" rotation="0 0 15" color="#3b82f6"></a-cylinder>
+      <a-cylinder class="student-rarm" radius="0.04" height="0.35" position="0.22 0.15 0" rotation="0 0 -15" color="#3b82f6"></a-cylinder>
+    </a-entity>
+
+    <a-entity id="student-2" student-idle="speed: 1.1" position="2.2 1.15 -2.4" rotation="0 -70 0">
+      <a-cylinder radius="0.18" height="0.7" color="#10b981"></a-cylinder>
+      <a-sphere class="student-head" radius="0.13" position="0 0.48 0" color="#fde047"></a-sphere>
+      <a-box width="0.22" height="0.08" depth="0.22" position="0 0.59 0" color="#7c2d12"></a-box>
+      <a-cylinder class="student-larm" radius="0.04" height="0.35" position="-0.22 0.15 0" rotation="0 0 15" color="#10b981"></a-cylinder>
+      <a-cylinder class="student-rarm" radius="0.04" height="0.35" position="0.22 0.15 0" rotation="0 0 -15" color="#10b981"></a-cylinder>
+    </a-entity>
+
+    <a-entity id="student-3" student-idle="speed: 0.85" position="0 1.15 -3.6" rotation="0 0 0">
+      <a-cylinder radius="0.18" height="0.7" color="#f59e0b"></a-cylinder>
+      <a-sphere class="student-head" radius="0.13" position="0 0.48 0" color="#ffedd5"></a-sphere>
+      <a-box width="0.22" height="0.08" depth="0.22" position="0 0.59 0" color="#451a03"></a-box>
+      <a-cylinder class="student-larm" radius="0.04" height="0.35" position="-0.22 0.15 0" rotation="0 0 15" color="#f59e0b"></a-cylinder>
+      <a-cylinder class="student-rarm" radius="0.04" height="0.35" position="0.22 0.15 0" rotation="0 0 -15" color="#f59e0b"></a-cylinder>
+    </a-entity>
+
+
+    <!-- 7. VR HEADSET RIG & CONTROLLERS -->
+    <a-entity id="cameraRig" position="0 0 0.6">
+      <a-entity 
+        id="head" 
+        camera 
+        look-controls="pointerLockEnabled: false" 
+        wasd-controls="acceleration: 20" 
+        position="0 1.6 0"
+        cursor="rayOrigin: mouse"
+        raycaster="objects: .clickable; far: 25">
+      </a-entity>
+      
+      <!-- Meta Quest 3S Controllers -->
+      <a-entity 
+        id="leftHand" 
+        laser-controls="hand: left" 
+        raycaster="objects: .clickable; far: 10; showLine: true;"
+        line="color: #00ffd5; opacity: 0.8">
+      </a-entity>
+      <a-entity 
+        id="rightHand" 
+        laser-controls="hand: right" 
+        raycaster="objects: .clickable; far: 10; showLine: true;"
+        line="color: #00ffd5; opacity: 0.8">
+      </a-entity>
+    </a-entity>
+
+  </a-scene>
+</body>
+</html>
