@@ -1,0 +1,135 @@
+/* Root styling for web UI elements */
+:root {
+  --primary-color: #00ffd5;
+  --secondary-color: #ff007f;
+  --bg-color: #0b0f19;
+  --panel-bg: rgba(15, 23, 42, 0.85);
+  --panel-border: rgba(0, 255, 213, 0.2);
+  --text-color: #e2e8f0;
+  --text-muted: #94a3b8;
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  font-family: var(--font-family);
+  color: var(--text-color);
+}
+
+/* Custom Overlay for Desktop Controls */
+#desktop-instructions {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 999;
+  width: 320px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#desktop-instructions h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.25rem;
+  color: var(--primary-color);
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#desktop-instructions p {
+  margin: 0 0 12px 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+#desktop-instructions ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+#desktop-instructions li {
+  margin-bottom: 6px;
+}
+
+#desktop-instructions kbd {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-family: monospace;
+}
+
+/* Close/toggle button for instructions */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: var(--primary-color);
+}
+
+/* Hidden state for instructions */
+#desktop-instructions.collapsed {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#desktop-instructions.collapsed * {
+  display: none;
+}
+
+#desktop-instructions.collapsed .info-icon {
+  display: flex;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.info-icon {
+  display: none;
+}
+
+/* Customize A-Frame VR Button Position if needed */
+.a-enter-vr {
+  z-index: 1000 !important;
+}
